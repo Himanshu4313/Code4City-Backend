@@ -1,0 +1,19 @@
+{
+  "name": "code4city",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Crowdsourced civic issue reporting and resolution system ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Himanshu kumar",
+  "license": "ISC"
+}
