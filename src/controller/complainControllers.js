@@ -1,5 +1,6 @@
-import complaintModel from "../models/complainSchema";
-
+import complaintModel from "../models/complainSchema.js";
+import cloudinary from "cloudinary";
+import fs from "fs/promises";
 export const createComplaint = async (req, res) => {
   const {
     title,
@@ -56,10 +57,12 @@ export const createComplaint = async (req, res) => {
     });
 
     if (!complaint) {
-      res.status(400).json({
+  
+      return res.status(400).json({
         success: false,
         message: "create complaint failed please try again",
       });
+    }
 
       // now handle image and video
 
@@ -84,7 +87,7 @@ export const createComplaint = async (req, res) => {
                 secure_url: result.secure_url,
               };
 
-              fs.rmSync(img.path);
+              await fs.rm(img.path);
             }
           }
 
@@ -102,7 +105,7 @@ export const createComplaint = async (req, res) => {
               secure_url: result.secure_url,
             };
 
-            fs.rmSync(videoFile.path);
+            await fs.rm(img.path);
           }
         } catch (error) {
           return res.status(500).json({
@@ -113,7 +116,7 @@ export const createComplaint = async (req, res) => {
         }
         await complaint.save();
       }
-    }
+    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -125,12 +128,16 @@ export const createComplaint = async (req, res) => {
 
 export const getAllComplaints = async (req, res) => {
   try {
-        const allComplaintData = await complaintModel.findAll();
+    const allComplaintData = await complaintModel.find();
+    return res.status(200).json({
+      success: true,
+      data: allComplaintData,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch the complaint data.",
-      error: error,
+      error: error.message,
     });
   }
 };
