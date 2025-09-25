@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import { config } from "dotenv";
 import crypto from "crypto";
-import { networkInterfaces } from "os";
+import { networkInterfaces, type } from "os";
 config();
 const Schema = mongoose.Schema;
 
@@ -16,6 +16,18 @@ const userSchema = new Schema(
       maxLength: [30, "Name must be less then 30 character"],
       trim: true,
       lowercase: true,
+    },
+    phoneNumber: {
+      type: Number,
+      required: [true, "please enter your phone number"],
+      maxLength: [10],
+      unique: true,
+    },
+    AadharNo: {
+      type: Number,
+      required: [true, "fill adhaar number"],
+      unique: true,
+      maxLength: [12],
     },
     email: {
       type: String,

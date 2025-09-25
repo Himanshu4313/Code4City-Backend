@@ -7,9 +7,9 @@ import crypto from "crypto";
 import sendEmail from "../utils/send.email.js";
 //function for user registeration
 export const getRegisteration = async (req, res) => {
-  const { fullName, email, password, avatar } = req.body;
+  const { fullName, email, password, avatar , phoneNumber , AadharNo } = req.body;
 
-  if (!fullName || !email || !password) {
+  if (!fullName || !email || !password || !phoneNumber || !AadharNo) {
     return res.status(400).json({ message: "All fields are mandatory" });
   }
 
@@ -30,6 +30,8 @@ export const getRegisteration = async (req, res) => {
 
     const newUser = await userModel.create({
       fullName,
+      phoneNumber,
+      AadharNo,
       email,
       password,
       avatar: {
