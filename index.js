@@ -2,7 +2,7 @@
 import app from './app.js';
 import cloudinary from 'cloudinary';
 //import database connection file
-import connectToDB from "./config/connect.database.js";
+import connectToDB from "./config/connectDatabase.js";
 
 import {config} from 'dotenv';
 config();

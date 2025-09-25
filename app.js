@@ -6,7 +6,8 @@ import express from "express";
 //import cors
 import cors from "cors";
 
-import authRouter from "./src/routes/auth.routes.js";
+import authRouter from "./src/routes/authRoutes.js";
+import complaintRouter from "./src/routes/complaintRoutes.js";
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 //create instance of express
@@ -25,6 +26,7 @@ app.use(morgan('dev'))
 
 // All routes here 
 app.use('/api/v1/user',authRouter); // for auth route
+app.use('/api/v1/complaint/',complaintRouter)
  
 app.get('/',(req , res)=>{
        res.status(200).json({Message:"Welcome to Code4City backend"});

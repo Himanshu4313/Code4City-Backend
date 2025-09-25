@@ -1,9 +1,9 @@
 import express from 'express';
-import { forgotPassword, getRegisteration, getUserInfo, loggedIn, logout, resetPassword } from '../controller/auth.controllers.js';
+import { forgotPassword, getRegisteration, getUserInfo, loggedIn, logout, resetPassword } from '../controller/authControllers.js';
 import authJWT from '../middleware/authJWT.js';
-import upload from '../middleware/multer.middleware.js';
-import { changePassword } from '../controller/auth.controllers.js';
-import { updateProfile } from '../controller/auth.controllers.js';
+import upload from '../middleware/multerMiddleware.js';
+import { changePassword } from '../controller/authControllers.js';
+import { updateProfile } from '../controller/authControllers.js';
 const authRouter = express.Router();
 
 //Authentication routes
