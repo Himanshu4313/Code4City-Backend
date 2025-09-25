@@ -1,4 +1,4 @@
-import complaintModel from "../models/complain.schema";
+import complaintModel from "../models/complainSchema";
 
 export const createComplaint = async (req, res) => {
   const {

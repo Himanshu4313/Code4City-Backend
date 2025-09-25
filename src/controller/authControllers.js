@@ -1,10 +1,10 @@
-import userModel from "../models/user.schema.js";
+import userModel from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import emailValid from "email-validator";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
 import crypto from "crypto";
-import sendEmail from "../utils/send.email.js";
+import sendEmail from "../utils/sendEmail.js";
 //function for user registeration
 export const getRegisteration = async (req, res) => {
   const { fullName, email, password, avatar , phoneNumber , AadharNo } = req.body;
