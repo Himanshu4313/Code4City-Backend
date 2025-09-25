@@ -1,6 +1,7 @@
 import express from "express";
 import authJWT from "../middleware/authJWT.js";
 import {createComplaint} from '../controller/complainControllers.js';
+import upload from "../middleware/multerMiddleware.js";
 
 const complaintRouter = express.Router();
 
