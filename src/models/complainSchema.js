@@ -44,7 +44,7 @@ const complain = new Schema(
         },
       },
     },
-    videoURL: {
+    video: {
       public_id: {
         type: String,
       },

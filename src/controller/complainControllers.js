@@ -3,11 +3,11 @@ import cloudinary from "cloudinary";
 import fs from "fs/promises";
 export const createComplaint = async (req, res) => {
   console.log("Enter controller");
-  const { title, description, category, location, videoURL } = req.body;
+  const { title, description, category, location, video } = req.body;
   const userID = req.user.id;
    
   try {
-    console.log(title , description , category , location , videoURL);
+    console.log(title , description , category , location , video );
     
     if (!title || !description || !category || !location ) {
       return res.status(400).json({
@@ -32,7 +32,7 @@ export const createComplaint = async (req, res) => {
       category,
       location,
       images: {},
-      videoURL: {},
+      video: {},
       user: userID,
     });
 
@@ -78,13 +78,13 @@ export const createComplaint = async (req, res) => {
     }
 
     // Upload video
-    if (req.files.videoURL) {
-      const videoFile = req.files.videoURL[0];
+    if (req.files.video) {
+      const videoFile = req.files.video[0];
       const result = await cloudinary.v2.uploader.upload(videoFile.path, {
         folder: "code4city/videos",
         resource_type: "video",
       });
-      complaint.videoURL = {
+      complaint.video = {
         public_id: result.public_id,
         secure_url: result.secure_url,
       };
