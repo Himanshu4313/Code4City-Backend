@@ -1,26 +1,143 @@
 import complaintModel from "../models/complainSchema.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
+// export const createComplaint = async (req, res) => {
+//   const {
+//     title,
+//     description,
+//     category,
+//     location,
+//     image1,
+//     image2,
+//     image3,
+//     videoURL,
+//   } = req.body;
+//   const userID = req.user.id;
+//   try {
+//     if (!title || !description || !category || !location || !videoURL) {
+//       return res.status(400).json({
+//         message: "Fill required fields",
+//       });
+//     }
+
+//     // check if same complaint already exists
+//     const existingComplaint = await complaintModel.findOne({
+//       category,
+//       location,
+//       description,
+//     });
+
+//     if (existingComplaint) {
+//       return res.status(400).json({ message: "Complaint already exists" });
+//     }
+
+//     const complaint = await complaintModel.create({
+//       title,
+//       description,
+//       category,
+//       location,
+//       images: {
+//         image1: {
+//           public_id: "",
+//           secure_url: image1,
+//         },
+//         image2: {
+//           public_id: "",
+//           secure_url: image2,
+//         },
+//         image3: {
+//           public_id: "",
+//           secure_url: image3,
+//         },
+//       },
+//       videoURL: {
+//         public_id: "",
+//         secure_url: videoURL,
+//       },
+//       user:userID
+//     });
+
+//     if (!complaint) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "create complaint failed please try again",
+//       });
+//     }
+
+//     // now handle image and video
+
+//     if (req.files) {
+//       try {
+//         // ✅ Upload images (image1, image2, image3)
+//         if (req.files.images) {
+//           for (let i = 0; i < req.files.images.length; i++) {
+//             const img = req.files.images[i];
+
+//             const result = await cloudinary.v2.uploader.upload(img.path, {
+//               folder: "code4city/images",
+//               width: 250,
+//               height: 250,
+//               gravity: "faces",
+//               crop: "fill",
+//             });
+
+//             // save into schema fields image1, image2, image3
+//             complaint.images[`image${i + 1}`] = {
+//               public_id: result.public_id,
+//               secure_url: result.secure_url,
+//             };
+
+//             await fs.rm(img.path);
+//           }
+//         }
+
+//         // ✅ Upload video
+//         if (req.files.video) {
+//           const videoFile = req.files.video[0];
+
+//           const result = await cloudinary.v2.uploader.upload(videoFile.path, {
+//             folder: "code4city/videos",
+//             resource_type: "video", // required for videos
+//           });
+
+//           complaint.videoURL = {
+//             public_id: result.public_id,
+//             secure_url: result.secure_url,
+//           };
+
+//           await fs.rm(img.path);
+//         }
+//       } catch (error) {
+//         return res.status(500).json({
+//           success: false,
+//           message: "File(s) not uploaded, Please try again",
+//           error,
+//         });
+//       }
+//       await complaint.save();
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to create complaint",
+//       error: error,
+//     });
+//   }
+// };
+
 export const createComplaint = async (req, res) => {
-  const {
-    title,
-    description,
-    category,
-    location,
-    image1,
-    image2,
-    image3,
-    videoURL,
-  } = req.body;
+  const { title, description, category, location, videourl } = req.body;
   const userID = req.user.id;
+
   try {
-    if (!title || !description || !category || !location || !videoURL) {
+    // ✅ Validate required fields
+    if (!title || !description || !category || !location || !videourl) {
       return res.status(400).json({
         message: "Fill required fields",
       });
     }
 
-    // check if same complaint already exists
+    // Check if same complaint exists
     const existingComplaint = await complaintModel.findOne({
       category,
       location,
@@ -31,99 +148,87 @@ export const createComplaint = async (req, res) => {
       return res.status(400).json({ message: "Complaint already exists" });
     }
 
-    const complaint = await complaintModel.create({
+    // Create base complaint
+    const complaint = new complaintModel({
       title,
       description,
       category,
       location,
-      images: {
-        image1: {
-          public_id: "",
-          secure_url: image1,
-        },
-        image2: {
-          public_id: "",
-          secure_url: image2,
-        },
-        image3: {
-          public_id: "",
-          secure_url: image3,
-        },
-      },
-      videoURL: {
-        public_id: "",
-        secure_url: videoURL,
-      },
+      images: {},
+      videoURL: {},
+      user: userID,
     });
-
-    if (!complaint) {
-      return res.status(400).json({
-        success: false,
-        message: "create complaint failed please try again",
+    // Upload images
+    if (req.files.image1) {
+      const img1 = req.files.image1[0];
+      const result = await cloudinary.v2.uploader.upload(img1.path, {
+        folder: "code4city/images",
+        width: 250,
+        height: 250,
+        gravity: "faces",
+        crop: "fill",
       });
+      complaint.images.image1 = {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+      };
+      await fs.rm(img1.path);
     }
 
-    // now handle image and video
-
-    if (req.files) {
-      try {
-        // ✅ Upload images (image1, image2, image3)
-        if (req.files.images) {
-          for (let i = 0; i < req.files.images.length; i++) {
-            const img = req.files.images[i];
-
-            const result = await cloudinary.v2.uploader.upload(img.path, {
-              folder: "code4city/images",
-              width: 250,
-              height: 250,
-              gravity: "faces",
-              crop: "fill",
-            });
-
-            // save into schema fields image1, image2, image3
-            complaint.images[`image${i + 1}`] = {
-              public_id: result.public_id,
-              secure_url: result.secure_url,
-            };
-
-            await fs.rm(img.path);
-          }
-        }
-
-        // ✅ Upload video
-        if (req.files.video) {
-          const videoFile = req.files.video[0];
-
-          const result = await cloudinary.v2.uploader.upload(videoFile.path, {
-            folder: "code4city/videos",
-            resource_type: "video", // required for videos
-          });
-
-          complaint.videoURL = {
-            public_id: result.public_id,
-            secure_url: result.secure_url,
-          };
-
-          await fs.rm(img.path);
-        }
-      } catch (error) {
-        return res.status(500).json({
-          success: false,
-          message: "File(s) not uploaded, Please try again",
-          error,
-        });
-      }
-      await complaint.save();
+    if (req.files.image2) {
+      const img2 = req.files.image2[0];
+      const result = await cloudinary.v2.uploader.upload(img2.path, {
+        folder: "code4city/images",
+      });
+      complaint.images.image2 = {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+      };
+      await fs.rm(img2.path);
     }
+
+    if (req.files.image3) {
+      const img3 = req.files.image3[0];
+      const result = await cloudinary.v2.uploader.upload(img3.path, {
+        folder: "code4city/images",
+      });
+      complaint.images.image3 = {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+      };
+      await fs.rm(img3.path);
+    }
+
+    // Upload video
+    if (req.files.videoURL) {
+      const videoFile = req.files.videoURL[0];
+      const result = await cloudinary.v2.uploader.upload(videoFile.path, {
+        folder: "code4city/videos",
+        resource_type: "video",
+      });
+      complaint.videoURL = {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+      };
+      await fs.rm(videoFile.path);
+    }
+
+     // ✅ Save complaint
+    await complaint.save();
+
+    // ✅ Send response
+    return res.status(201).json({
+      success: true,
+      message: "Complaint created successfully",
+      data: complaint,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Failed to create complaint",
-      error: error,
+      message: "Something went wrong while creating complaint",
     });
   }
 };
-
 export const getAllComplaints = async (req, res) => {
   try {
     const allComplaintData = await complaintModel.find();
@@ -141,7 +246,6 @@ export const getAllComplaints = async (req, res) => {
 };
 
 export const getComplaintById = async (req, res) => {
-  
   try {
     const data = await complaintModel.findById(req.params.id);
     if (!data) {
@@ -174,7 +278,7 @@ export const updateComplaintStatus = async (req, res) => {
     // Update status
     const updatedComplaint = await complaintModel.findByIdAndUpdate(
       req.params.id,
-      { status },
+      { status }
     );
 
     if (!updatedComplaint) {
@@ -198,7 +302,6 @@ export const updateComplaintStatus = async (req, res) => {
   }
 };
 
-
 export const deleteComplaint = async (req, res) => {
   try {
     const complaint = await complaintModel.findById(req.params.id);
@@ -214,9 +317,12 @@ export const deleteComplaint = async (req, res) => {
     if (complaint.images) {
       for (let key of ["image1", "image2", "image3"]) {
         if (complaint.images[key]?.public_id) {
-          await cloudinary.v2.uploader.destroy(complaint.images[key].public_id, {
-            invalidate: true,
-          });
+          await cloudinary.v2.uploader.destroy(
+            complaint.images[key].public_id,
+            {
+              invalidate: true,
+            }
+          );
         }
       }
     }
@@ -251,16 +357,19 @@ export const filterComplaintsByDate = async (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({
         success: false,
-        message: "Please provide both startDate and endDate in YYYY-MM-DD format",
+        message:
+          "Please provide both startDate and endDate in YYYY-MM-DD format",
       });
     }
 
-    const complaints = await complaintModel.find({
-      createdAt: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      },
-    }).sort({ createdAt: -1 });
+    const complaints = await complaintModel
+      .find({
+        createdAt: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        },
+      })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -297,7 +406,9 @@ export const filterComplaints = async (req, res) => {
       filter.category = category;
     }
 
-    const complaints = await complaintModel.find(filter).sort({ createdAt: -1 });
+    const complaints = await complaintModel
+      .find(filter)
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,

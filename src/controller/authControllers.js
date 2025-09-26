@@ -90,7 +90,8 @@ export const getRegisteration = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "User register sucessfully",
-      data: newUser,
+      token:token,
+      data:newUser,
     });
   } catch (error) {
     console.log(error);
