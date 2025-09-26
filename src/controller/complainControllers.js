@@ -1,143 +1,20 @@
 import complaintModel from "../models/complainSchema.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
-// export const createComplaint = async (req, res) => {
-//   const {
-//     title,
-//     description,
-//     category,
-//     location,
-//     image1,
-//     image2,
-//     image3,
-//     videoURL,
-//   } = req.body;
-//   const userID = req.user.id;
-//   try {
-//     if (!title || !description || !category || !location || !videoURL) {
-//       return res.status(400).json({
-//         message: "Fill required fields",
-//       });
-//     }
-
-//     // check if same complaint already exists
-//     const existingComplaint = await complaintModel.findOne({
-//       category,
-//       location,
-//       description,
-//     });
-
-//     if (existingComplaint) {
-//       return res.status(400).json({ message: "Complaint already exists" });
-//     }
-
-//     const complaint = await complaintModel.create({
-//       title,
-//       description,
-//       category,
-//       location,
-//       images: {
-//         image1: {
-//           public_id: "",
-//           secure_url: image1,
-//         },
-//         image2: {
-//           public_id: "",
-//           secure_url: image2,
-//         },
-//         image3: {
-//           public_id: "",
-//           secure_url: image3,
-//         },
-//       },
-//       videoURL: {
-//         public_id: "",
-//         secure_url: videoURL,
-//       },
-//       user:userID
-//     });
-
-//     if (!complaint) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "create complaint failed please try again",
-//       });
-//     }
-
-//     // now handle image and video
-
-//     if (req.files) {
-//       try {
-//         // ✅ Upload images (image1, image2, image3)
-//         if (req.files.images) {
-//           for (let i = 0; i < req.files.images.length; i++) {
-//             const img = req.files.images[i];
-
-//             const result = await cloudinary.v2.uploader.upload(img.path, {
-//               folder: "code4city/images",
-//               width: 250,
-//               height: 250,
-//               gravity: "faces",
-//               crop: "fill",
-//             });
-
-//             // save into schema fields image1, image2, image3
-//             complaint.images[`image${i + 1}`] = {
-//               public_id: result.public_id,
-//               secure_url: result.secure_url,
-//             };
-
-//             await fs.rm(img.path);
-//           }
-//         }
-
-//         // ✅ Upload video
-//         if (req.files.video) {
-//           const videoFile = req.files.video[0];
-
-//           const result = await cloudinary.v2.uploader.upload(videoFile.path, {
-//             folder: "code4city/videos",
-//             resource_type: "video", // required for videos
-//           });
-
-//           complaint.videoURL = {
-//             public_id: result.public_id,
-//             secure_url: result.secure_url,
-//           };
-
-//           await fs.rm(img.path);
-//         }
-//       } catch (error) {
-//         return res.status(500).json({
-//           success: false,
-//           message: "File(s) not uploaded, Please try again",
-//           error,
-//         });
-//       }
-//       await complaint.save();
-//     }
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Failed to create complaint",
-//       error: error,
-//     });
-//   }
-// };
-
 export const createComplaint = async (req, res) => {
-  const { title, description, category, location, videourl } = req.body;
+  console.log("Enter controller");
+  const { title, description, category, location, videoURL } = req.body;
   const userID = req.user.id;
-
+   
   try {
-    // ✅ Validate required fields
-    if (!title || !description || !category || !location || !videourl) {
+    console.log(title , description , category , location , videoURL);
+    
+    if (!title || !description || !category || !location ) {
       return res.status(400).json({
         message: "Fill required fields",
       });
     }
 
-    // Check if same complaint exists
     const existingComplaint = await complaintModel.findOne({
       category,
       location,
@@ -148,7 +25,7 @@ export const createComplaint = async (req, res) => {
       return res.status(400).json({ message: "Complaint already exists" });
     }
 
-    // Create base complaint
+    // Create complaint instance (not saved yet)
     const complaint = new complaintModel({
       title,
       description,
@@ -158,6 +35,7 @@ export const createComplaint = async (req, res) => {
       videoURL: {},
       user: userID,
     });
+
     // Upload images
     if (req.files.image1) {
       const img1 = req.files.image1[0];
@@ -172,7 +50,7 @@ export const createComplaint = async (req, res) => {
         public_id: result.public_id,
         secure_url: result.secure_url,
       };
-      await fs.rm(img1.path);
+      await fs.rm(img1.path, { force: true });
     }
 
     if (req.files.image2) {
@@ -184,7 +62,7 @@ export const createComplaint = async (req, res) => {
         public_id: result.public_id,
         secure_url: result.secure_url,
       };
-      await fs.rm(img2.path);
+     await fs.rm(img2.path, { force: true });
     }
 
     if (req.files.image3) {
@@ -196,7 +74,7 @@ export const createComplaint = async (req, res) => {
         public_id: result.public_id,
         secure_url: result.secure_url,
       };
-      await fs.rm(img3.path);
+      await fs.rm(img3.path), {force : true};
     }
 
     // Upload video
@@ -210,25 +88,27 @@ export const createComplaint = async (req, res) => {
         public_id: result.public_id,
         secure_url: result.secure_url,
       };
-      await fs.rm(videoFile.path);
+       await fs.rm(videoFile.path, { force: true });
     }
 
-     // ✅ Save complaint
+    // Save complaint after adding files
     await complaint.save();
 
-    // ✅ Send response
     return res.status(201).json({
       success: true,
       message: "Complaint created successfully",
       data: complaint,
     });
   } catch (error) {
+    console.error("Complaint creation error:", error);
     return res.status(500).json({
       success: false,
       message: "Something went wrong while creating complaint",
+      error: error.message,
     });
   }
 };
+
 export const getAllComplaints = async (req, res) => {
   try {
     const allComplaintData = await complaintModel.find();

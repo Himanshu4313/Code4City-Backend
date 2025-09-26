@@ -17,8 +17,6 @@ const complain = new Schema(
     },
     location: {
         type: String,
-        enum: ["point"],
-        default: "point",
     },
     images: {
       image1: {
