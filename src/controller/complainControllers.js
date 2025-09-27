@@ -208,15 +208,15 @@ export const deleteComplaint = async (req, res) => {
     }
 
     // Delete video from Cloudinary
-    if (complaint.videoURL?.public_id) {
-      await cloudinary.v2.uploader.destroy(complaint.videoURL.public_id, {
+    if (complaint.video?.public_id) {
+      await cloudinary.v2.uploader.destroy(complaint.video.public_id, {
         resource_type: "video",
         invalidate: true,
       });
     }
 
     // Delete complaint from DB
-    await complaintModel.findByIdAndDelete(complaintId);
+    await complaintModel.findByIdAndDelete(req.params.id);
 
     return res.status(200).json({
       success: true,
