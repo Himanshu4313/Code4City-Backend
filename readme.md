@@ -69,15 +69,13 @@ npm install
 
 4. Locally run
 
-```
+ ```
  npm run dev
-# or
-npm start
-``
-
-## live server link
+ # or
+ npm start
+ ```
+# Live server link
 ```
-
 https://code4city.onrender.com
 
 ```
