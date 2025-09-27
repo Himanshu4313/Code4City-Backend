@@ -150,6 +150,7 @@ export const loggedIn = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "User login sucessfully",
+      token:token,
       data: userExists,
     });
   } catch (error) {
