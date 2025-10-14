@@ -78,8 +78,30 @@ npm start
 ## live server link
 ```
 
+
+```
 https://code4city.onrender.com
 
 ```
+## API endpoints and their purposes
 
-```
+# user api endpoint 
+
+POST-https://code4city.onrender.com/api/v1/user/register
+POST-https://code4city.onrender.com/api/v1/user/login
+POST-https://code4city.onrender.com/api/v1/user/logout
+GET-https://code4city.onrender.com/api/v1/user/me
+POST-https://code4city.onrender.com/api/v1/forgot-password
+POST-https://code4city.onrender.com/api/v1/user/reset-password/:resetToken
+POST-https://code4city.onrender.com/api/v1/user/change-password
+PUT-https://code4city.onrender.com/api/v1/user/update
+
+# complaint api endpoint
+
+POST-https://code4city.onrender.com/api/v1/complaint/createComplaint
+GET-https://code4city.onrender.com/api/v1/complaint/
+GET-https://code4city.onrender.com/api/v1/complaint/:id
+PATCH-https://code4city.onrender.com/api/v1/complaint/update/:id
+DELETE-https://code4city.onrender.com/api/v1/complaint/:id
+GET-https://code4city.onrender.com/api/v1/complaint/filter
+GET-https://code4city.onrender.com/api/v1/complaint/filter/complaint-type
